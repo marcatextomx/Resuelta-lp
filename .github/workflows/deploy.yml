@@ -32,8 +32,21 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
 
+      - name: Validate service account file
+        run: |
+          test -s "$GOOGLE_APPLICATION_CREDENTIALS" || { echo "::error::gcp-key.json está vacío"; exit 1; }
+          node -e "
+            const k = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+            for (const f of ['type', 'project_id', 'private_key', 'client_email']) {
+              if (!k[f]) { console.error('Falta el campo: ' + f); process.exit(1); }
+            }
+            console.log('OK — type=' + k.type + ' project_id=' + k.project_id + ' client_email=' + k.client_email);
+          "
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
+
       - name: Deploy Firestore rules
-        run: npx firebase-tools deploy --only firestore:rules --project "$PROJECT_ID"
+        run: npx firebase-tools deploy --only firestore:rules --project "$PROJECT_ID" --non-interactive
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
           PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
