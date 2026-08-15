@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Blog articles: public read, only signed-in admins can write.
+    match /articles/{articleId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Contact-form leads: anyone can submit one, only signed-in admins can
+    // read or manage them (via the Firebase console).
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'telefono', 'empresa', 'empleados', 'createdAt'])
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() < 200
+        && request.resource.data.telefono is string && request.resource.data.telefono.size() < 50
+        && request.resource.data.empresa is string && request.resource.data.empresa.size() < 200;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
