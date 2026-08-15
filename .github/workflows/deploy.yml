@@ -26,13 +26,21 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
-      - name: Deploy Firestore rules
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only firestore:rules
+      - name: Write GCP service account credentials
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
         env:
-          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
+
+      - name: Deploy Firestore rules
+        run: npx firebase-tools deploy --only firestore:rules --project "$PROJECT_ID"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
           PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+
+      - name: Remove GCP service account credentials
+        if: always()
+        run: rm -f "${{ github.workspace }}/gcp-key.json"
 
       - name: Deploy to Firebase Hosting (live channel)
         uses: FirebaseExtended/action-hosting-deploy@v0
