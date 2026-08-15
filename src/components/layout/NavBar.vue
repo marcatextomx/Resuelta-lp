@@ -11,7 +11,6 @@ import logoWhite from '../../assets/logo-white.png'
       <a href="/#inicio">Inicio</a>
       <a href="/#servicios">Servicios</a>
       <a href="/#nosotros">Nosotros</a>
-      <RouterLink to="/blog">Blog</RouterLink>
       <a href="/#contacto">Contacto</a>
     </div>
   </div>
@@ -51,10 +50,6 @@ import logoWhite from '../../assets/logo-white.png'
 
 .nav__links a:hover {
   text-decoration: underline;
-}
-
-.nav__links a.router-link-active {
-  color: var(--yellow);
 }
 
 @media (max-width: 760px) {

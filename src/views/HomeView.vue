@@ -7,7 +7,6 @@ import ServicesSection from '../components/home/ServicesSection.vue'
 import ProfileSection from '../components/home/ProfileSection.vue'
 import TestimonialSection from '../components/home/TestimonialSection.vue'
 import FaqSection from '../components/home/FaqSection.vue'
-import BlogPreviewSection from '../components/home/BlogPreviewSection.vue'
 import ContactSection from '../components/home/ContactSection.vue'
 </script>
 
@@ -19,7 +18,6 @@ import ContactSection from '../components/home/ContactSection.vue'
   <ProfileSection />
   <TestimonialSection />
   <FaqSection />
-  <BlogPreviewSection />
   <ContactSection />
   <WhatsAppButton />
 </template>
