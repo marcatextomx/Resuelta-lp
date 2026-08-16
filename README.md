@@ -136,15 +136,27 @@ Lo que está cubierto en el código (todo lo que se controla desde el sitio):
 - Open Graph y Twitter Card completos (`index.html`) — vista previa correcta al compartir
   el link en WhatsApp/Facebook/X. La imagen usada es `public/og-image.png`.
 - Datos estructurados JSON-LD tipo `LegalService` (schema.org) con dirección, teléfono,
-  horario y redes — ayuda a que Google muestre un rich result / ficha de negocio.
+  horario, redes, especialidades (`knowsAbout`) y los 6 servicios reales como `makesOffer`
+  — ayuda a que Google entienda que es un despacho B2B (empresas, no trabajadores).
 - `public/robots.txt` y `public/sitemap.xml`.
 - `<link rel="canonical">` apuntando a `https://resuelta.mx/`.
 - Un solo `<h1>` por página y jerarquía de encabezados correcta (`h1` → `h2` → `h3`).
 - Página 404 marcada con `noindex` (el fallback de SPA siempre responde 200, así que se
   evita que Google indexe rutas rotas).
+- Copy de servicios y FAQ alineado a las keywords comerciales objetivo (sin keyword
+  stuffing — son los mismos 6 servicios reales, solo con títulos/descripciones más
+  precisos).
+- HTML semántico: `<address>` para la dirección, `mailto:` en el correo, `aria-label`
+  en los íconos de redes sociales.
+- Fuente cargada con `<link rel="preconnect">` + stylesheet directo en vez de `@import`
+  (evita un salto extra de red antes de descubrir la tipografía).
+- El SDK de Firebase (~123 KB gzip) se carga con `import()` dinámico solo cuando el
+  visitante envía el formulario de contacto, no en la carga inicial de la página.
 
-**Cuando cambies de dominio o el copy principal**, actualiza también `index.html`
-(`og:url`, `og:title`, JSON-LD) y `public/sitemap.xml` para que sigan siendo exactos.
+**Mantenimiento:** si editas los servicios en `ServicesSection.vue`, actualiza también
+el bloque `makesOffer` del JSON-LD en `index.html` para que coincidan (no se generan
+automáticamente el uno del otro). Si cambias de dominio o el copy principal, actualiza
+también `og:url`, `og:title` y `public/sitemap.xml`.
 
 Lo que **no** se resuelve desde el código, y toca hacer manualmente en las herramientas
 de Google (esto pesa tanto o más que lo técnico para el posicionamiento local):

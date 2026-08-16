@@ -2,10 +2,26 @@
 import { ref } from 'vue'
 
 const faqs = [
-  { q: '¿Qué hacen exactamente?', a: 'Implementamos sistemas preventivos de cumplimiento laboral en tu empresa. Diseñamos contratos, políticas internas y demás medidas para prevenir contingencias laborales en tu empresa.' },
-  { q: '¿Necesito ya tener un problema para contactarlos?', a: 'No. Nuestro enfoque es 100% preventivo. Actuamos antes de que un error se convierta en una multa o una contingencia costosa.' },
-  { q: '¿Qué empresas los necesitan?', a: 'Cualquier empresa en México con personal contratado, desde PyMEs en expansión hasta corporativos que buscan ordenar sus operaciones, evitar multas o cumplir auditorías.' },
-  { q: 'Ya tengo contador o abogado general, ¿aún así aplica?', a: 'Sí. Los contadores y abogados corporativos atienden temas fiscales, comerciales o litigios. Nosotros aportamos la especialización técnica y legal específica en la dinámica laboral cotidiana.' },
+  {
+    q: '¿Qué hacen exactamente?',
+    a: 'Implementamos sistemas preventivos de derecho laboral empresarial en tu empresa. Diseñamos contratos, políticas internas y demás medidas para prevenir demandas y contingencias laborales.',
+  },
+  {
+    q: '¿Necesito ya tener un problema para contactarlos?',
+    a: 'No. Nuestro enfoque es 100% preventivo. Actuamos antes de que un error se convierta en una multa o una contingencia costosa.',
+  },
+  {
+    q: '¿Qué pasa si un empleado me demanda?',
+    a: 'Te representamos en todo el proceso: desde la conciliación laboral obligatoria ante el Centro de Conciliación hasta el litigio laboral si es necesario. La defensa patronal oportuna reduce el riesgo de condenas económicas altas.',
+  },
+  {
+    q: '¿Qué empresas los necesitan?',
+    a: 'Cualquier empresa en México con personal contratado, desde PyMEs en expansión hasta corporativos que buscan ordenar sus operaciones, evitar multas o cumplir auditorías.',
+  },
+  {
+    q: 'Ya tengo contador o abogado general, ¿aún así aplica?',
+    a: 'Sí. Los contadores y abogados corporativos atienden temas fiscales, comerciales o litigios. Nosotros aportamos la especialización en derecho laboral empresarial y relaciones laborales para empresas.',
+  },
 ]
 
 const openIndex = ref(0)

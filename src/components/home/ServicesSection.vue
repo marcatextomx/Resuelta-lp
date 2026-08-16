@@ -1,11 +1,35 @@
 <script setup>
 const services = [
-  { num: '01', title: 'Contratación y Blindaje Documental', desc: 'Contratos a medida, convenios de confidencialidad y formatos operativos.' },
-  { num: '02', title: 'Compliance y Normatividad', desc: 'Comisiones Mixtas, Reglamento Interior (RIT) ante CFCRL y Protocolos Obligatorios.' },
-  { num: '03', title: 'Capacitación y Registros STPS', desc: 'Planes y programas de capacitación y adiestramiento.' },
-  { num: '04', title: 'Gestión de Terminaciones y Conciliación', desc: 'Cálculos de finiquitos, convenios de salida y representación conciliatoria.' },
-  { num: '05', title: 'Especialización REPSE y Gestoría Patronal', desc: 'Trámites FONACOT, padrón REPSE e informativas (ICSOE/SISUB).' },
-  { num: '06', title: 'Consultoría y Capacitación Continua', desc: 'Asesoría remota y/o presencial en materia laboral, y talleres ejecutivos.' },
+  {
+    num: '01',
+    title: 'Contratos Laborales para Empresas',
+    desc: 'Contratos laborales a la medida, convenios de confidencialidad y formatos operativos para blindar a tu empresa.',
+  },
+  {
+    num: '02',
+    title: 'Compliance Laboral y Normatividad',
+    desc: 'Comisiones Mixtas, Reglamento Interior de Trabajo (RIT) ante el CFCRL y Protocolos Obligatorios.',
+  },
+  {
+    num: '03',
+    title: 'Capacitación y Registros STPS',
+    desc: 'Planes y programas de capacitación, adiestramiento y asesoría ante inspecciones de la STPS.',
+  },
+  {
+    num: '04',
+    title: 'Despidos, Finiquitos y Conciliación Laboral',
+    desc: 'Cálculos de finiquitos y liquidaciones laborales, convenios de salida y conciliación laboral ante el Centro de Conciliación.',
+  },
+  {
+    num: '05',
+    title: 'REPSE y Gestoría Patronal',
+    desc: 'Trámites FONACOT, padrón REPSE e informativas (ICSOE/SISUB) para tu empresa.',
+  },
+  {
+    num: '06',
+    title: 'Asesoría Laboral para Empresas',
+    desc: 'Asesoría laboral para empresas, remota y/o presencial, y talleres ejecutivos de prevención laboral.',
+  },
 ]
 </script>
 

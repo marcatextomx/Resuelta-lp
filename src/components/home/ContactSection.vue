@@ -1,7 +1,6 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import logoWhite from '../../assets/logo-white.png'
-import { createLead } from '../../firebase/leads'
 
 const form = reactive({ nombre: '', telefono: '', empresa: '', empleados: '' })
 const attemptedSubmit = ref(false)
@@ -29,6 +28,9 @@ async function onSubmit() {
   }
   sending.value = true
   try {
+    // Loaded on demand: most visitors never submit, so this keeps the
+    // Firebase SDK out of the initial page weight entirely.
+    const { createLead } = await import('../../firebase/leads')
     await createLead({ ...form })
   } catch (e) {
     console.error('No se pudo guardar el contacto', e)
@@ -44,36 +46,45 @@ async function onSubmit() {
   <div id="contacto" class="contact">
     <div class="contact__box">
       <div class="contact__info">
-        <img :src="logoWhite" alt="Resuelta" class="contact__logo" />
+        <img
+          :src="logoWhite"
+          alt="Resuelta — abogados laborales para empresas"
+          class="contact__logo"
+          width="201"
+          height="53"
+          loading="lazy"
+        />
         <a href="https://wa.me/526623188301" target="_blank" rel="noopener" class="contact__whatsapp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366" aria-hidden="true">
             <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 4 3.4.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z" />
           </svg>
           (662) 318 8301
         </a>
-        <p class="contact__email">contacto@resuelta.mx</p>
-        <p class="contact__address">
+        <p class="contact__email">
+          <a href="mailto:contacto@resuelta.mx" class="contact__email-link">contacto@resuelta.mx</a>
+        </p>
+        <address class="contact__address">
           Blvd. Paseo las Quintas #77A, casi esquina con Navarrete, Colonia Santa Fe, CP 83249, Hermosillo,
           Sonora.
-        </p>
+        </address>
         <p class="contact__hours">Lunes a Viernes | 8 AM – 3 PM</p>
         <div class="contact__socials">
-          <a href="https://instagram.com/resuelta.legal" target="_blank" rel="noopener">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
+          <a href="https://instagram.com/resuelta.legal" target="_blank" rel="noopener" aria-label="Instagram de Resuelta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">
               <rect x="2" y="2" width="20" height="20" rx="5" />
               <circle cx="12" cy="12" r="4.2" />
               <circle cx="17.3" cy="6.7" r="1.1" fill="#fff" stroke="none" />
             </svg>
           </a>
-          <a href="https://facebook.com/resuelta.legal" target="_blank" rel="noopener">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+          <a href="https://facebook.com/resuelta.legal" target="_blank" rel="noopener" aria-label="Facebook de Resuelta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
               <path d="M13.5 21v-7.5H16l.4-3H13.5V8.4c0-.87.24-1.46 1.5-1.46H16.5V4.34C16.24 4.3 15.35 4.22 14.31 4.22c-2.16 0-3.64 1.32-3.64 3.74V10.5H8v3h2.67V21h2.83z" />
             </svg>
           </a>
         </div>
       </div>
       <div class="contact__form">
-        <h3 class="contact__form-title">Agenda una cita</h3>
+        <h2 class="contact__form-title">Agenda una cita</h2>
         <p class="contact__form-subtitle">Obtén un diagnóstico laboral legal gratis, solo durante 2026.</p>
         <div class="contact__fields">
           <div class="contact__field">
@@ -180,13 +191,24 @@ async function onSubmit() {
 }
 
 .contact__email {
-  color: #fff;
   font-size: 14px;
   font-weight: 600;
   margin: 0 0 14px 0;
 }
 
+.contact__email-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.contact__email-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
 .contact__address {
+  font-style: normal;
+  display: block;
   color: var(--lavender);
   font-size: 14px;
   line-height: 1.5;

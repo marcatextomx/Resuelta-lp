@@ -5,7 +5,7 @@ import logoWhite from '../../assets/logo-white.png'
 <template>
   <div id="inicio" class="hero">
     <div class="hero__content">
-      <img :src="logoWhite" alt="Resuelta" class="hero__logo" />
+      <img :src="logoWhite" alt="Resuelta — abogados laborales para empresas" class="hero__logo" width="245" height="75" />
       <h1 class="hero__title">
         Abogados Laborales
         <span class="hero__title--accent">para Empresas</span>

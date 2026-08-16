@@ -11,10 +11,18 @@ import joelPhoto from '../../assets/joel-photo.png'
         <p class="profile__role">Socio Fundador | Especialista en Compliance Laboral y Gestión de Riesgo Patronal</p>
         <p class="profile__desc">
           Especialista en el diseño e implementación de esquemas de cumplimiento normativo, enfocado en
-          auditar, estructurar y mitigar riesgos legales en la gestión del capital humano.
+          auditar, estructurar y mitigar riesgos legales en la gestión del capital humano de empresas en
+          Hermosillo.
         </p>
       </div>
-      <img :src="joelPhoto" alt="Lic. Joel Pérez" class="profile__photo" />
+      <img
+        :src="joelPhoto"
+        alt="Lic. Joel Pérez, abogado laboral para empresas en Hermosillo"
+        class="profile__photo"
+        width="257"
+        height="335"
+        loading="lazy"
+      />
     </div>
   </div>
 </template>
