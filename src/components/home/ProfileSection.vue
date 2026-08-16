@@ -6,7 +6,7 @@ import joelPhoto from '../../assets/joel-photo.png'
   <div id="nosotros" class="profile">
     <div class="profile__grid">
       <div class="profile__text">
-        <h3 class="profile__name">Lic. Joel Pérez</h3>
+        <h2 class="profile__name">Lic. Joel Pérez</h2>
         <div class="profile__line"></div>
         <p class="profile__role">Socio Fundador | Especialista en Compliance Laboral y Gestión de Riesgo Patronal</p>
         <p class="profile__desc">

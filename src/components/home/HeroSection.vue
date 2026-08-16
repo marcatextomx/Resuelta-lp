@@ -6,8 +6,10 @@ import logoWhite from '../../assets/logo-white.png'
   <div id="inicio" class="hero">
     <div class="hero__content">
       <img :src="logoWhite" alt="Resuelta" class="hero__logo" />
-      <h1 class="hero__title">Abogados Laborales</h1>
-      <h1 class="hero__title hero__title--accent">para Empresas</h1>
+      <h1 class="hero__title">
+        Abogados Laborales
+        <span class="hero__title--accent">para Empresas</span>
+      </h1>
       <p class="hero__subtitle">Hermosillo, Sonora</p>
       <a href="#servicios" class="hero__arrow" aria-label="Ir a servicios">
         <svg width="20" height="32" viewBox="0 0 24 36" fill="none" stroke="#fff" stroke-width="2">
@@ -51,12 +53,13 @@ import logoWhite from '../../assets/logo-white.png'
   line-height: 1.15;
   font-weight: 800;
   letter-spacing: -1.5px;
-  margin: 0 0 6px 0;
+  margin: 0 0 5% 0;
 }
 
 .hero__title--accent {
+  display: block;
   color: var(--blue);
-  margin: 0 0 5%;
+  margin-top: 6px;
 }
 
 .hero__subtitle {

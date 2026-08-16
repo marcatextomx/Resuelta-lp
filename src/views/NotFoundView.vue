@@ -1,3 +1,20 @@
+<script setup>
+import { onMounted, onUnmounted } from 'vue'
+
+// SPA fallback always returns HTTP 200, so tell crawlers explicitly not to
+// index broken URLs via a robots meta tag instead.
+let meta
+onMounted(() => {
+  meta = document.createElement('meta')
+  meta.name = 'robots'
+  meta.content = 'noindex, nofollow'
+  document.head.appendChild(meta)
+})
+onUnmounted(() => {
+  meta?.remove()
+})
+</script>
+
 <template>
   <div class="wrap">
     <div>

@@ -128,6 +128,38 @@ git push -u origin main
 En cuanto agregues los secrets de GitHub (paso 6) y hagas este primer push, el workflow
 de deploy corre automáticamente.
 
+## SEO
+
+Lo que está cubierto en el código (todo lo que se controla desde el sitio):
+
+- `<title>` y meta description optimizados con marca + keyword + ciudad.
+- Open Graph y Twitter Card completos (`index.html`) — vista previa correcta al compartir
+  el link en WhatsApp/Facebook/X. La imagen usada es `public/og-image.png`.
+- Datos estructurados JSON-LD tipo `LegalService` (schema.org) con dirección, teléfono,
+  horario y redes — ayuda a que Google muestre un rich result / ficha de negocio.
+- `public/robots.txt` y `public/sitemap.xml`.
+- `<link rel="canonical">` apuntando a `https://resuelta.mx/`.
+- Un solo `<h1>` por página y jerarquía de encabezados correcta (`h1` → `h2` → `h3`).
+- Página 404 marcada con `noindex` (el fallback de SPA siempre responde 200, así que se
+  evita que Google indexe rutas rotas).
+
+**Cuando cambies de dominio o el copy principal**, actualiza también `index.html`
+(`og:url`, `og:title`, JSON-LD) y `public/sitemap.xml` para que sigan siendo exactos.
+
+Lo que **no** se resuelve desde el código, y toca hacer manualmente en las herramientas
+de Google (esto pesa tanto o más que lo técnico para el posicionamiento local):
+
+1. **Google Search Console** ([search.google.com/search-console](https://search.google.com/search-console))
+   — agrega la propiedad `resuelta.mx`, envía `https://resuelta.mx/sitemap.xml` y pide
+   indexación manual de la home la primera vez.
+2. **Google Business Profile** ([business.google.com](https://business.google.com)) — el
+   factor más importante para aparecer en el mapa/"3-pack" local de Hermosillo. Usa la
+   misma dirección, teléfono y horario que están en el JSON-LD.
+3. **Reseñas** en Google Business — cantidad y frecuencia de reseñas es señal de ranking
+   local fuerte.
+4. **Backlinks** — directorios de abogados en México, cámaras empresariales de Sonora,
+   notas de prensa, etc. Nada de esto lo resuelve el código del sitio.
+
 ## Notas
 
 - El formulario de contacto guarda cada intento en la colección `leads` de Firestore
