@@ -61,7 +61,7 @@ async function onSubmit() {
           (662) 318 8301
         </a>
         <p class="contact__email">
-          <a href="mailto:contacto@resuelta.mx" class="contact__email-link">contacto@resuelta.mx</a>
+          <a href="mailto:joel@resuelta.mx" class="contact__email-link">joel@resuelta.mx</a>
         </p>
         <address class="contact__address">
           Blvd. Paseo las Quintas #77A, casi esquina con Navarrete, Colonia Santa Fe, CP 83249, Hermosillo,
