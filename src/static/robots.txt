@@ -1,0 +1,31 @@
+# Buscadores tradicionales y de IA: todo el sitio es público.
+User-agent: *
+Allow: /
+
+# Buscadores de IA que citan fuentes (permitidos de forma explícita)
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Rastreadores que entrenan modelos. [DECIDIR] Cambiar a "Disallow: /" si no se quiere que el contenido se use para entrenar.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://resuelta.mx/sitemap.xml

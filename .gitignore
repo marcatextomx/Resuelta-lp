@@ -33,3 +33,6 @@ ui-debug.log
 *.njsproj
 *.sln
 *.sw?
+
+# Herramientas de diseño
+.taste-skill/

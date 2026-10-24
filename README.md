@@ -1,181 +1,49 @@
-# Resuelta.mx
+# resuelta.mx · sitio estático
 
-Landing page de Resuelta (abogados laborales, Hermosillo, Sonora). Construida en
-**Vue 3 + Vite**, sin backend propio — el único dato que se guarda es el formulario de
-contacto, en **Firestore** (Firebase).
+HTML estático generado con un script de Node sin dependencias. Todo el contenido, el schema y el FAQ salen en el HTML desde el servidor: nada depende de JavaScript para leerse.
 
-## Stack
+## Comandos
 
-- Vue 3 (`<script setup>`) + Vite
-- Vue Router 4
-- Firebase: Firestore (leads del formulario de contacto), Hosting (deploy del sitio estático)
-- GitHub Actions para deploy automático a Firebase Hosting
+```bash
+node build.mjs          # genera dist/
+node serve.mjs 4321     # revisa dist/ en http://localhost:4321 (URLs limpias y 404 como en Firebase)
+node tools/check.mjs    # revisa enlaces, h1, títulos, imágenes y JSON-LD
+firebase deploy --only hosting
+```
 
-No hay servidor propio: el build es 100% estático y el SDK de Firebase corre en el
-navegador del visitante.
+Publicación: al hacer merge a `main`, GitHub Actions (`.github/workflows/deploy.yml`) compila con `npm run build` y publica `dist/` en Firebase Hosting, proyecto `resuelta-d4663` (resuelta.mx). Un pull request a `main` genera una vista previa en un canal temporal de Firebase.
 
 ## Estructura
 
-```
-src/
-  assets/            Logos y foto del abogado
-  components/
-    layout/          NavBar, botón flotante de WhatsApp
-    home/             Secciones de la landing (hero, servicios, FAQ, contacto, etc.)
-  firebase/
-    config.js         Inicialización del SDK (lee variables de entorno)
-    leads.js            Guardado de leads del formulario de contacto en Firestore
-  router/index.js      Ruta única (/) + 404
-  views/                HomeView, NotFoundView
-firestore.rules         Reglas de seguridad de Firestore
-firebase.json             Configuración de Hosting/Firestore
-.github/workflows/        Deploy automático (producción + previews de PR)
-```
+| Ruta | Qué es |
+| --- | --- |
+| `src/site.mjs` | Datos únicos: nombre, dirección, teléfono, horario, servicios. Cambiar aquí cambia todo el sitio y el schema. |
+| `src/lib.mjs` | Fotos, FAQ, migas de pan, cubo del logo, nodo `Service` y la plantilla de página de servicio. |
+| `src/quiz.mjs` | Cuestionario de diagnóstico (7 preguntas + contacto) y comprobante que se llena con las respuestas. |
+| `src/pages/*.mjs` | Una página por archivo: `meta` (título, descripción, ruta, FAQ, schema) y `body`. |
+| `src/blog/posts.mjs` | Las guías del blog: título, H1, resumen citable, cuerpo, FAQ, fuentes y fechas. Agregar una guía = agregar un objeto. |
+| `src/pages/blog.mjs` | Índice `/blog/` y la página de cada guía (schema `Blog`, `BlogPosting`, `FAQPage`). |
+| `src/static/` | `styles.css`, `main.js`, `robots.txt`, fotos en `img/`, `og.png`, `logo.png`. |
+| `build.mjs` | Layout, schema `@graph`, `sitemap.xml`, `llms.txt`, `favicon.svg`. |
+| `assets/` | Fotos originales y `credits.json` con licencia y autor de cada una. |
+| `firebase.json` | `cleanUrls`, barra final, 404 real, caché y encabezados de seguridad. |
 
-## 1. Requisitos
+## URLs
 
-- Node.js 20+
-- Una cuenta de Firebase (gratis) y, opcionalmente, la CLI: `npm i -g firebase-tools`
-- Un repositorio en GitHub si quieres el deploy automático
+`/` · `/servicios/` · `/servicios/contratos-laborales/` · `/servicios/compliance-laboral/` · `/servicios/capacitacion-stps/` · `/servicios/despidos-finiquitos/` · `/servicios/repse/` · `/servicios/asesoria-laboral/` · `/nosotros/joel-perez/` · `/diagnostico/` · `/blog/` · `/blog/<guía>/` · `/aviso-de-privacidad/` · `404.html` · `/blog/feed.xml` (RSS)
 
-## 2. Crear el proyecto de Firebase
+## Schema
 
-1. Ve a [console.firebase.google.com](https://console.firebase.google.com) → **Agregar
-   proyecto** (el plan gratuito **Spark** alcanza para un sitio de este tamaño).
-2. Dentro del proyecto, crea una **app web** (ícono `</>`) y copia el objeto
-   `firebaseConfig` que te muestra — solo necesitas `apiKey`, `projectId` y `appId`.
-3. **Firestore Database** → *Crear base de datos* → modo producción → elige una región
-   (por ejemplo `us-central` o la más cercana a Hermosillo).
-4. Cuando corras `firebase deploy` (manual o vía GitHub Actions) las reglas de
-   `firestore.rules` de este repo se publican automáticamente: cualquiera puede
-   *crear* un lead desde el formulario, pero nadie puede leerlos ni modificarlos desde
-   la app — los revisas directamente en la consola de Firebase (pestaña Firestore).
+Cada página publica un `@graph` con `LegalService` (un solo `@id` para todo el sitio), `WebSite`, la página (`WebPage`, `CollectionPage` o `ProfilePage`), `BreadcrumbList` y, donde aplica, `Service`, `Person` y `FAQPage`. Las preguntas del `FAQPage` se generan del mismo arreglo que el texto visible, así nunca difieren.
 
-## 3. Configurar variables de entorno
+## Blog
 
-```bash
-cp .env.example .env
-```
+Cada guía abre con "En resumen" (40–60 palabras citables), usa H2 en forma de pregunta, tiene tabla o ejemplo, preguntas frecuentes abiertas, fuentes con enlace a la ley oficial, fechas visibles y su enlace al servicio relacionado. Entra sola al sitemap, al feed RSS y a `llms.txt`. Para publicar una guía nueva: agregar su objeto en `src/blog/posts.mjs` y correr `node build.mjs`.
 
-Rellena `.env` con `apiKey`, `projectId` y `appId` del paso anterior. Este archivo nunca
-se sube a git (está en `.gitignore`).
+## Diagnóstico
 
-## 4. Desarrollo local
+El formulario no usa servidor: al enviar, arma el mensaje y abre `wa.me/526623188301`. Sin JavaScript se muestra como formulario normal. Si existe `gtag`, dispara el evento `generate_lead`.
 
-```bash
-npm install
-npm run dev
-```
+## Fotografías
 
-## 5. Deploy manual (primera vez / puntual)
-
-```bash
-npm i -g firebase-tools   # una sola vez
-firebase login
-```
-
-Edita `.firebaserc` y reemplaza `REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID` con el ID real de
-tu proyecto (lo ves en Configuración del proyecto, en la consola de Firebase).
-
-```bash
-npm run build
-firebase deploy
-```
-
-Eso publica Hosting + reglas de Firestore. Tu sitio queda en
-`https://TU-PROYECTO.web.app`.
-
-## 6. Deploy automático (GitHub Actions)
-
-Este repo ya trae dos workflows:
-
-- `.github/workflows/deploy.yml` — al hacer push a `main`, compila y despliega a Hosting
-  (canal `live`) y publica las reglas de Firestore.
-- `.github/workflows/deploy-preview.yml` — en cada Pull Request, despliega un canal de
-  vista previa temporal de Firebase Hosting (útil para revisar cambios antes de fusionar).
-
-Para que funcionen, agrega estos **secrets** en GitHub (`Settings → Secrets and
-variables → Actions → New repository secret`):
-
-| Secret | De dónde sale |
-|---|---|
-| `VITE_FIREBASE_API_KEY` | del `firebaseConfig` |
-| `VITE_FIREBASE_PROJECT_ID` | del `firebaseConfig` |
-| `VITE_FIREBASE_APP_ID` | del `firebaseConfig` |
-| `FIREBASE_SERVICE_ACCOUNT` | JSON completo de una service account (ver abajo) |
-
-Para generar `FIREBASE_SERVICE_ACCOUNT`:
-
-1. En la consola de Firebase → ⚙️ *Configuración del proyecto* → **Cuentas de servicio**.
-2. **Generar nueva clave privada** → descarga el JSON.
-3. Copia todo el contenido del archivo JSON como valor del secret
-   `FIREBASE_SERVICE_ACCOUNT` (pégalo tal cual, no hace falta codificarlo).
-
-Con eso, cada push a `main` publica el sitio solo. No necesitas correr `firebase deploy`
-a mano nunca más.
-
-## 7. Git
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: Resuelta landing en Vue 3 + Firebase"
-git branch -M main
-git remote add origin <URL-de-tu-repo-en-GitHub>
-git push -u origin main
-```
-
-En cuanto agregues los secrets de GitHub (paso 6) y hagas este primer push, el workflow
-de deploy corre automáticamente.
-
-## SEO
-
-Lo que está cubierto en el código (todo lo que se controla desde el sitio):
-
-- `<title>` y meta description optimizados con marca + keyword + ciudad.
-- Open Graph y Twitter Card completos (`index.html`) — vista previa correcta al compartir
-  el link en WhatsApp/Facebook/X. La imagen usada es `public/og-image.png`.
-- Datos estructurados JSON-LD tipo `LegalService` (schema.org) con dirección, teléfono,
-  horario, redes, especialidades (`knowsAbout`) y los 6 servicios reales como `makesOffer`
-  — ayuda a que Google entienda que es un despacho B2B (empresas, no trabajadores).
-- `public/robots.txt` y `public/sitemap.xml`.
-- `<link rel="canonical">` apuntando a `https://resuelta.mx/`.
-- Un solo `<h1>` por página y jerarquía de encabezados correcta (`h1` → `h2` → `h3`).
-- Página 404 marcada con `noindex` (el fallback de SPA siempre responde 200, así que se
-  evita que Google indexe rutas rotas).
-- Copy de servicios y FAQ alineado a las keywords comerciales objetivo (sin keyword
-  stuffing — son los mismos 6 servicios reales, solo con títulos/descripciones más
-  precisos).
-- HTML semántico: `<address>` para la dirección, `mailto:` en el correo, `aria-label`
-  en los íconos de redes sociales.
-- Fuente cargada con `<link rel="preconnect">` + stylesheet directo en vez de `@import`
-  (evita un salto extra de red antes de descubrir la tipografía).
-- El SDK de Firebase (~123 KB gzip) se carga con `import()` dinámico solo cuando el
-  visitante envía el formulario de contacto, no en la carga inicial de la página.
-
-**Mantenimiento:** si editas los servicios en `ServicesSection.vue`, actualiza también
-el bloque `makesOffer` del JSON-LD en `index.html` para que coincidan (no se generan
-automáticamente el uno del otro). Si cambias de dominio o el copy principal, actualiza
-también `og:url`, `og:title` y `public/sitemap.xml`.
-
-Lo que **no** se resuelve desde el código, y toca hacer manualmente en las herramientas
-de Google (esto pesa tanto o más que lo técnico para el posicionamiento local):
-
-1. **Google Search Console** ([search.google.com/search-console](https://search.google.com/search-console))
-   — agrega la propiedad `resuelta.mx`, envía `https://resuelta.mx/sitemap.xml` y pide
-   indexación manual de la home la primera vez.
-2. **Google Business Profile** ([business.google.com](https://business.google.com)) — el
-   factor más importante para aparecer en el mapa/"3-pack" local de Hermosillo. Usa la
-   misma dirección, teléfono y horario que están en el JSON-LD.
-3. **Reseñas** en Google Business — cantidad y frecuencia de reseñas es señal de ranking
-   local fuerte.
-4. **Backlinks** — directorios de abogados en México, cámaras empresariales de Sonora,
-   notas de prensa, etc. Nada de esto lo resuelve el código del sitio.
-
-## Notas
-
-- El formulario de contacto guarda cada intento en la colección `leads` de Firestore
-  (visible desde la consola de Firebase) antes de abrir WhatsApp, para no perder
-  prospectos que no completan el envío por WhatsApp.
-- El sitio no tiene blog ni panel de administración — es una landing page de una sola
-  ruta (`/`).
+Fotos de Hermosillo de Wikimedia Commons (CC BY-SA y CC0), con crédito en el pie de cada página que las usa. Lista completa en `assets/credits.json`. Ninguna muestra al despacho ni a su equipo.
