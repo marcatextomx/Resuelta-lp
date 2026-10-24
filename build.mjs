@@ -5,6 +5,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { site, services, servicePath } from './src/site.mjs';
 import { esc, stripTags, used, cube, ids } from './src/lib.mjs';
+import { sorted } from './src/pages/blog.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const out = join(root, 'dist');
@@ -80,7 +81,8 @@ function graph(meta) {
       inLanguage: 'es-MX',
       isPartOf: { '@id': ids.site },
       about: { '@id': meta.about || ids.org },
-      dateModified: site.updated,
+      ...(meta.published ? { datePublished: meta.published } : {}),
+      dateModified: meta.modified || site.updated,
       ...(meta.trail ? { breadcrumb: { '@id': `${url}#ruta` } } : {}),
       ...(meta.mainEntity ? { mainEntity: meta.mainEntity } : {})
     }
@@ -118,6 +120,7 @@ function graph(meta) {
 const nav = [
   ['Servicios', '/servicios/'],
   ['Nosotros', site.founder.path],
+  ['Blog', '/blog/'],
   ['Preguntas', '/#preguntas'],
   ['Contacto', '/#contacto']
 ];
@@ -125,7 +128,7 @@ const nav = [
 function header(meta) {
   const links = nav
     .map(([name, href]) => {
-      const here = href === meta.path || (href === '/servicios/' && meta.path.startsWith('/servicios/'));
+      const here = href === meta.path || (href !== '/' && !href.includes('#') && meta.path.startsWith(href));
       return `<li><a href="${href}"${here ? ' aria-current="page"' : ''}>${name}</a></li>`;
     })
     .join('');
@@ -149,7 +152,7 @@ function footer(credits) {
   <div class="foot__line">
     <p class="foot__what">Resuelta · Abogados laborales para empresas en Hermosillo</p>
     <nav class="foot__links" aria-label="Servicios">${svc}</nav>
-    <p class="foot__legal">© 2026 · <a href="/aviso-de-privacidad/">Aviso de privacidad</a></p>
+    <p class="foot__legal">© 2026 · <a href="/blog/">Blog</a> · <a href="/aviso-de-privacidad/">Aviso de privacidad</a></p>
   </div>
   <p class="foot__nap">${site.addressDisplay} · <a href="${site.phoneHref}">${site.phoneDisplay}</a> · <a href="mailto:${site.email}">${site.email}</a> · ${site.hours}</p>
   ${credits ? `<p class="foot__credits">Fotografías: ${credits}</p>` : ''}
@@ -169,13 +172,17 @@ ${meta.noindex ? '<meta name="robots" content="noindex, follow">' : `<link rel="
 <meta name="theme-color" content="#081239">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/logo.png">
-<meta property="og:type" content="website">
+<link rel="alternate" type="application/rss+xml" title="Guías laborales de Resuelta" href="${site.url}/blog/feed.xml">
+<meta property="og:type" content="${meta.ogType || 'website'}">${meta.published ? `
+<meta property="article:published_time" content="${meta.published}">
+<meta property="article:modified_time" content="${meta.modified}">
+<meta property="article:section" content="${esc(meta.section)}">` : ''}
 <meta property="og:site_name" content="Resuelta">
 <meta property="og:locale" content="es_MX">
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${esc(meta.title)}">
 <meta property="og:description" content="${esc(meta.description)}">
-<meta property="og:image" content="${site.url}/og.png">
+<meta property="og:image" content="${meta.ogImage || `${site.url}/og.png`}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,6 +214,9 @@ Resuelta solo representa a empresas y patrones; no atiende a trabajadores contra
 ## Servicios
 ${services.map((s) => `- [${s.long}](${site.url}${servicePath(s.slug)}): ${s.summary}`).join('\n')}
 
+## Guías
+${sorted.map((p) => `- [${p.title}](${site.url}/blog/${p.slug}/): ${p.summary}`).join('\n')}
+
 ## Páginas clave
 - [Todos los servicios](${site.url}/servicios/)
 - [Diagnóstico laboral gratis](${site.url}/diagnostico/): siete preguntas; la respuesta llega por WhatsApp.
@@ -219,6 +229,35 @@ ${services.map((s) => `- [${s.long}](${site.url}${servicePath(s.slug)}): ${s.sum
 - Correo: ${site.email}
 - Dirección: ${site.addressDisplay}
 - Horario: ${site.hours}
+`;
+}
+
+// Feed RSS 2.0 del blog
+function feed() {
+  const rfc = (iso) => new Date(`${iso}T12:00:00-07:00`).toUTCString();
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Guías laborales para empresas · Resuelta</title>
+  <link>${site.url}/blog/</link>
+  <atom:link href="${site.url}/blog/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>Guías de derecho laboral para empresas en Hermosillo, con el artículo de la Ley Federal del Trabajo que respalda cada respuesta.</description>
+  <language>es-MX</language>
+  <lastBuildDate>${rfc(sorted[0].updated)}</lastBuildDate>
+${sorted
+  .map(
+    (p) => `  <item>
+    <title>${esc(p.title)}</title>
+    <link>${site.url}/blog/${p.slug}/</link>
+    <guid isPermaLink="true">${site.url}/blog/${p.slug}/</guid>
+    <pubDate>${rfc(p.published)}</pubDate>
+    <category>${esc(p.section)}</category>
+    <description>${esc(p.summary)}</description>
+  </item>`
+  )
+  .join('\n')}
+</channel>
+</rss>
 `;
 }
 
@@ -237,27 +276,35 @@ async function build() {
 
   const files = (await readdir(join(root, 'src/pages'))).filter((f) => f.endsWith('.mjs')).sort();
   const sitemap = [];
+  let count = 0;
   for (const f of files) {
-    used.photos.clear();
     const mod = await import(pathToFileURL(join(root, 'src/pages', f)).href);
-    const { meta, body } = mod.default();
-    const creditLine = [...used.photos].map(creditFor).filter(Boolean).join(' · ');
-    const dest = meta.file ? join(out, meta.file) : join(out, meta.path, 'index.html');
-    await mkdir(dirname(dest), { recursive: true });
-    await writeFile(dest, layout(meta, body, creditLine));
-    if (!meta.noindex) sitemap.push(meta.path);
-    console.log(`  ${meta.path.padEnd(36)} título ${String(meta.title.length).padStart(2)} · descripción ${meta.description.length}`);
+    // Una página devuelve { meta, body }; el blog devuelve una función por página.
+    const result = mod.default();
+    const builders = Array.isArray(result) ? result : [() => result];
+    for (const make of builders) {
+      used.photos.clear();
+      const { meta, body } = Array.isArray(result) ? make() : mod.default();
+      const creditLine = [...used.photos].map(creditFor).filter(Boolean).join(' · ');
+      const dest = meta.file ? join(out, meta.file) : join(out, meta.path, 'index.html');
+      await mkdir(dirname(dest), { recursive: true });
+      await writeFile(dest, layout(meta, body, creditLine));
+      if (!meta.noindex) sitemap.push([meta.path, meta.modified || site.updated]);
+      count++;
+      console.log(`  ${meta.path.padEnd(40)} título ${String(meta.title.length).padStart(2)} · descripción ${meta.description.length}`);
+    }
   }
 
   await writeFile(
     join(out, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemap
-      .map((p) => `  <url><loc>${site.url}${p}</loc><lastmod>${site.updated}</lastmod></url>`)
+      .map(([p, mod]) => `  <url><loc>${site.url}${p}</loc><lastmod>${mod}</lastmod></url>`)
       .join('\n')}\n</urlset>\n`
   );
   await writeFile(join(out, 'favicon.svg'), cube(40).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '));
   await writeFile(join(out, 'llms.txt'), llms());
-  console.log(`\n${files.length} páginas · sitemap con ${sitemap.length} URL`);
+  await writeFile(join(out, 'blog', 'feed.xml'), feed());
+  console.log(`\n${count} páginas · sitemap con ${sitemap.length} URL`);
 }
 
 build().catch((e) => {

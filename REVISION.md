@@ -60,6 +60,11 @@
 - Vigencia de 3 años.
 - ICSOE (LSS, art. 15-A), SISUB (Ley del INFONAVIT, art. 29 Bis), FONACOT (LFT, art. 132, fr. XXVI Bis).
 
+### Blog (`src/blog/posts.mjs`)
+- **Finiquito o liquidación:** arts. 26, 33, 47 a 50, 76, 79, 80, 84, 87, 89, 162, 485, 486 y 518; tabla de vacaciones de la reforma de 2023 y el ejemplo con números ($9,344 de finiquito y $75,344 con liquidación).
+- **REPSE:** arts. 12, 13 y 15; multas de los arts. 1004-A y 1004-C; no deducibilidad ni acreditamiento de IVA para el cliente; periodicidad del ICSOE y del SISUB.
+- Cuando Joel revise cada guía, cambiar `reviewed: false` a `true`. La firma pasa a decir "Revisado por Lic. Joel Pérez" y el schema agrega `reviewedBy`; es una señal fuerte de autoridad para Google y la IA.
+
 ### Asesoría laboral
 - "Propuesta por escrito después del diagnóstico": confirmar que así trabajan.
 
